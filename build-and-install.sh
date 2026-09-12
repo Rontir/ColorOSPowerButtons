@@ -4,7 +4,7 @@ set -euo pipefail
 BASE_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 WORK_DIR="$BASE_DIR/.work-upstream"
 PATCH_DIR="$BASE_DIR/patch"
-OUT_APK="$BASE_DIR/ColorOS-Power-Actions-v1.0.6-debug.apk"
+OUT_APK="$BASE_DIR/ColorOS-Power-Actions-v1.0.8-debug.apk"
 UPSTREAM="https://github.com/Nielk74/coloros-power-button-launcher.git"
 UPSTREAM_TAG="v1.2.0"
 PKG="com.heytap.wallet"
@@ -151,8 +151,6 @@ if ! "${ADB[@]}" install --no-streaming -r -g -t "$OUT_APK"; then
   "${ADB[@]}" install --no-streaming -r -g -t "$OUT_APK"
 fi
 
-# Legacy test builds used READ_LOGS + overlay. The current double-only build declares neither.
-# Reset the old overlay app-op if it still exists; errors are harmless on firmware that omits it.
 "${ADB[@]}" shell appops set "$PKG" SYSTEM_ALERT_WINDOW default >/dev/null 2>&1 || true
 
 log "Granting reboot-repair permission"
@@ -206,7 +204,7 @@ else
 fi
 
 if "${ADB[@]}" shell dumpsys package "$PKG" | grep -q 'TriplePressMonitorService'; then
-  echo "WARNING: legacy test service still appears in package metadata."
+  echo "WARNING: legacy service still appears in package metadata."
 else
   echo "Legacy foreground service: removed"
 fi
