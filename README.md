@@ -81,13 +81,13 @@ Wireless ADB:
 The build output is:
 
 ```text
-ColorOS-Power-Actions-v1.0.6-debug.apk
+ColorOS-Power-Actions-v1.0.8-debug.apk
 ```
 
 The installer also:
 
 - removes old third-party power-button monitor packages,
-- stops removed legacy test services when present,
+- stops removed legacy services when present,
 - resets the legacy overlay app-op,
 - preserves the selected target when upgrading with the same signing key,
 - sets `double_tap_power_button_value=1` (Wallet),
@@ -101,11 +101,19 @@ The installer also:
 Power Actions requests only what the bridge needs:
 
 - `RECEIVE_BOOT_COMPLETED` - restore its own Accessibility entry if ColorOS removes it after reboot.
-- `USE_BIOMETRIC` - authenticate the direct package route on a locked device.
 - `WRITE_SECURE_SETTINGS` - ADB-granted boot-repair capability.
 - `BIND_ACCESSIBILITY_SERVICE` - system-bound permission for the narrow redirect service.
 
 There is no `INTERNET` permission.
+
+## First-run setup and lock screen
+
+Power Actions intentionally requests only the access it actually needs.
+
+- `RECEIVE_BOOT_COMPLETED` is granted at install time.
+- Accessibility is required for the scoped `com.heytap.tas` redirect. If it is missing when the app opens, Power Actions automatically opens Android Accessibility settings so the user can enable `Power Actions redirect`.
+- `WRITE_SECURE_SETTINGS` has no normal Android permission dialog. The Linux/ADB installer grants it when ColorOS allows the grant; it is used only to restore this app's Accessibility entry and keep the ColorOS Wallet shortcut selected.
+- No biometric permission is used. When the shortcut is triggered while the device is locked, Power Actions asks Android to dismiss the keyguard. System UI presents the normal fingerprint, face, PIN or pattern flow, and the selected target opens only after the device is unlocked.
 
 ## Diagnostics
 
@@ -123,4 +131,4 @@ Accessibility receives the Wallet event only after Android creates the OEM Walle
 
 ## Upstream and license
 
-Based on the MIT-licensed `Nielk74/coloros-power-button-launcher` Wallet bridge. The original license notice is retained in `LICENSE-UPSTREAM.txt`.
+Based on the MIT-licensed `Nielk74/coloros-power-button-launcher` Wallet bridge. The original license notice is retained in [`LICENSE-UPSTREAM.txt`](LICENSE-UPSTREAM.txt).
