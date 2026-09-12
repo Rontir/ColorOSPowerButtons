@@ -40,16 +40,16 @@ ColorOS Wallet event
 -> selected app
 ```
 
-On the tested X9s Pro firmware, ColorOS can re-open the Wallet activity roughly 0.8-1.0 seconds after the selected app is already visible. The hybrid recovery path is:
+On the tested X9s Pro firmware, ColorOS can re-open the Wallet activity roughly 0.8-1.0 seconds after the selected app is already visible. The recovery path is:
 
 ```text
 late Wallet reassertion
 -> one BACK
 -> 75 ms settle
--> always restore selected app through BridgeActivity
+-> restore selected app through BridgeActivity
 ```
 
-The mandatory restore is intentional. If BACK is delivered late during a transition, the target is brought forward again instead of leaving the launcher exposed.
+The restore is intentional. If BACK is delivered late during a transition, the target is brought forward again instead of leaving the launcher exposed.
 
 ## UI
 
@@ -58,7 +58,7 @@ The settings screen is AMOLED-first by default:
 - pure black base background,
 - dark elevated surfaces,
 - dynamic system accent color,
-- large 28-34 dp card radii,
+- large rounded cards,
 - pill buttons and status badges,
 - Pixel-like typography hierarchy,
 - large touch targets.
@@ -87,7 +87,7 @@ ColorOS-Power-Actions-v1.0.6-debug.apk
 The installer also:
 
 - removes old third-party power-button monitor packages,
-- stops the removed Triple Press service if an old test build is still present,
+- stops removed legacy test services when present,
 - resets the legacy overlay app-op,
 - preserves the selected target when upgrading with the same signing key,
 - sets `double_tap_power_button_value=1` (Wallet),
@@ -117,16 +117,10 @@ If behavior changes after a ColorOS update:
 
 Reproduce several double presses, stop with `Ctrl+C`, and inspect the resulting log before changing timing constants.
 
-## Important engineering notes
-
-Read [`AGENTS.md`](AGENTS.md) before modifying behavior and [`AI_CONTEXT.md`](AI_CONTEXT.md) for the full history of what was tested and rejected.
-
-The main rule is simple: **do not redesign a working redirect based only on theory. Capture a real-device log first.**
-
 ## Known limitation
 
 Accessibility receives the Wallet event only after Android creates the OEM Wallet window. A very short Wallet flash may therefore remain visible on some firmware. Eliminating the OEM activity before window creation would require a deeper system/root-level hook.
 
 ## Upstream and license
 
-Based on the MIT-licensed `Nielk74/coloros-power-button-launcher` Wallet bridge. The original license notice is retained in [`LICENSE-UPSTREAM.txt`](LICENSE-UPSTREAM.txt).
+Based on the MIT-licensed `Nielk74/coloros-power-button-launcher` Wallet bridge. The original license notice is retained in `LICENSE-UPSTREAM.txt`.
