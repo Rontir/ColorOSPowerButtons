@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <uses-permission
         android:name="android.permission.WRITE_SECURE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
@@ -27,7 +26,6 @@
         android:theme="@style/Theme.PowerActions"
         android:usesCleartextTraffic="false">
 
-        <!-- User-facing Material You configuration screen. -->
         <activity
             android:name=".SettingsActivity"
             android:exported="true"
@@ -39,18 +37,11 @@
             </intent-filter>
         </activity>
 
-        <!--
-            Invisible one-shot bridge for the ColorOS Wallet shortcut.
-            CATEGORY_INFO is intentional: package front-door lookup prefers INFO before LAUNCHER,
-            so firmware launching com.heytap.wallet by package reaches the bridge while the app icon
-            continues to open SettingsActivity.
-        -->
         <activity
             android:name=".BridgeActivity"
             android:excludeFromRecents="true"
             android:exported="true"
             android:finishOnTaskLaunch="true"
-            android:showWhenLocked="true"
             android:taskAffinity="com.heytap.wallet.redirect"
             android:theme="@style/Theme.PowerActions.Redirect"
             android:turnScreenOn="true">
@@ -64,10 +55,6 @@
             </intent-filter>
         </activity>
 
-        <!--
-            Narrow redirect: receives only window-state events from the OPPO Wallet package and
-            cannot retrieve window content.
-        -->
         <service
             android:name=".WalletRedirectAccessibilityService"
             android:directBootAware="true"
@@ -82,7 +69,6 @@
                 android:resource="@xml/accessibility_service_config" />
         </service>
 
-        <!-- ColorOS may remove third-party accessibility entries after reboot. -->
         <receiver
             android:name=".AccessibilityRestoreReceiver"
             android:directBootAware="true"
