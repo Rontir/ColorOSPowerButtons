@@ -1,5 +1,6 @@
 package com.heytap.wallet;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -49,6 +50,7 @@ public final class SettingsActivity extends Activity {
     private View setupCard;
     private EditText searchApps;
     private Button testButton;
+    private boolean setupPromptAttempted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +67,9 @@ public final class SettingsActivity extends Activity {
     protected void onResume() {
         super.onResume();
         AccessibilityStateRepair.restoreIfAuthorized(this, "settings resume");
+        ensureWalletModeIfAuthorized();
         refreshScreen();
+        maybeRequestRequiredAccess();
     }
 
     private void configureSystemBars() {
@@ -126,12 +130,50 @@ public final class SettingsActivity extends Activity {
 
         findViewById(R.id.accessibility_button).setOnClickListener(view -> {
             view.performHapticFeedback(HapticFeedbackConstants.CONFIRM);
-            try {
-                startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
-            } catch (RuntimeException exception) {
-                Toast.makeText(this, R.string.settings_open_failed, Toast.LENGTH_LONG).show();
-            }
+            openAccessibilitySettings();
         });
+    }
+
+    private void ensureWalletModeIfAuthorized() {
+        if (checkSelfPermission(Manifest.permission.WRITE_SECURE_SETTINGS)
+                != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        try {
+            Settings.Secure.putInt(
+                    getContentResolver(),
+                    "double_tap_power_button_value",
+                    1);
+        } catch (SecurityException exception) {
+            // The installer normally grants this permission.
+        } catch (RuntimeException ignored) {
+            // Vendor Settings providers can reject undocumented keys on some builds.
+        }
+    }
+
+    private void maybeRequestRequiredAccess() {
+        if (setupPromptAttempted || isRedirectEnabled()) {
+            return;
+        }
+        setupPromptAttempted = true;
+        appList.postDelayed(() -> {
+            if (isFinishing() || isRedirectEnabled()) {
+                return;
+            }
+            Toast.makeText(
+                    this,
+                    R.string.accessibility_required_prompt,
+                    Toast.LENGTH_LONG).show();
+            openAccessibilitySettings();
+        }, 350L);
+    }
+
+    private void openAccessibilitySettings() {
+        try {
+            startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
+        } catch (RuntimeException exception) {
+            Toast.makeText(this, R.string.settings_open_failed, Toast.LENGTH_LONG).show();
+        }
     }
 
     private void refreshScreen() {
@@ -202,7 +244,9 @@ public final class SettingsActivity extends Activity {
             statusBadge.setText(R.string.status_active);
             statusBadge.setBackgroundResource(R.drawable.bg_badge_active);
             statusBadge.setTextColor(getColor(R.color.on_primary_container));
-            statusDescription.setText(R.string.status_active_description);
+            statusDescription.setText(hasSecureSettingsGrant()
+                    ? R.string.status_active_description
+                    : R.string.status_active_no_repair_description);
             setupCard.setVisibility(View.GONE);
         } else {
             statusBadge.setText(R.string.status_setup);
@@ -211,6 +255,11 @@ public final class SettingsActivity extends Activity {
             statusDescription.setText(R.string.status_setup_description);
             setupCard.setVisibility(View.VISIBLE);
         }
+    }
+
+    private boolean hasSecureSettingsGrant() {
+        return checkSelfPermission(Manifest.permission.WRITE_SECURE_SETTINGS)
+                == PackageManager.PERMISSION_GRANTED;
     }
 
     private boolean isRedirectEnabled() {
