@@ -1,6 +1,7 @@
 package com.heytap.wallet;
 
 import android.accessibilityservice.AccessibilityService;
+import android.app.KeyguardManager;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
@@ -26,6 +27,7 @@ public final class WalletRedirectAccessibilityService extends AccessibilityServi
     private final Runnable initialBridge = () -> launchOneShotBridge(false);
     private final Runnable recoveryBridge = () -> launchOneShotBridge(true);
 
+    private KeyguardManager keyguardManager;
     private long cycleStartedAt;
     private long protectionUntil;
     private long recoveryDebounceUntil;
@@ -34,6 +36,7 @@ public final class WalletRedirectAccessibilityService extends AccessibilityServi
     public void onCreate() {
         super.onCreate();
         LaunchTargetStore.initializeDefault(this);
+        keyguardManager = getSystemService(KeyguardManager.class);
     }
 
     @Override
@@ -62,6 +65,13 @@ public final class WalletRedirectAccessibilityService extends AccessibilityServi
             if (now >= recoveryDebounceUntil) {
                 recoveryDebounceUntil = now + REASSERT_DEBOUNCE_MS;
                 boolean dismissed = performGlobalAction(GLOBAL_ACTION_BACK);
+
+                if (isDeviceLocked()) {
+                    Log.i(TAG, "Late Wallet reassertion dismissed during keyguard flow; back="
+                            + dismissed);
+                    return;
+                }
+
                 mainHandler.removeCallbacks(recoveryBridge);
                 mainHandler.postDelayed(recoveryBridge, REASSERT_BRIDGE_DELAY_MS);
                 Log.i(TAG, "Late ColorOS Wallet reassertion detected; recoveryBack="
@@ -86,6 +96,11 @@ public final class WalletRedirectAccessibilityService extends AccessibilityServi
         mainHandler.removeCallbacks(initialBridge);
         mainHandler.removeCallbacks(recoveryBridge);
         mainHandler.postDelayed(initialBridge, BRIDGE_DELAY_MS);
+    }
+
+    private boolean isDeviceLocked() {
+        return keyguardManager != null
+                && (keyguardManager.isDeviceLocked() || keyguardManager.isKeyguardLocked());
     }
 
     private void launchOneShotBridge(boolean recovery) {
