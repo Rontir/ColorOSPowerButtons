@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.8
+
+- Use Android `KeyguardManager.requestDismissKeyguard` for locked-screen launches.
+- Let System UI present the normal device unlock instead of an app-owned biometric prompt.
+- Launch the selected target only after the system keyguard is actually dismissed.
+- Dismiss OPPO Wallet reassertions during unlock without creating duplicate unlock requests.
+- Automatically open Accessibility settings when the scoped redirect is not enabled.
+- If `WRITE_SECURE_SETTINGS` is granted, keep Wallet mode selected and restore the Accessibility entry after reboot.
+- Remove the no-longer-needed `USE_BIOMETRIC` permission.
+
 ## 1.0.6
 
 - Add AMOLED-first Pixel-like Material You settings UI.
