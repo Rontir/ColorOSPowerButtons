@@ -1,0 +1,52 @@
+name: Android build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android 36 SDK
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Prepare upstream project
+        run: |
+          git clone --depth 1 --branch v1.2.0 https://github.com/Nielk74/coloros-power-button-launcher.git .ci-upstream
+          rm -rf .ci-upstream/walletshim
+          cp -a patch/walletshim .ci-upstream/walletshim
+          chmod +x .ci-upstream/gradlew
+
+      - name: Lint and build
+        run: |
+          cd .ci-upstream
+          ./gradlew :walletshim:lintDebug :walletshim:assembleDebug
+
+      - name: Stage APK
+        run: |
+          mkdir -p build-output
+          cp .ci-upstream/walletshim/build/outputs/apk/debug/walletshim-debug.apk \
+            build-output/ColorOS-Power-Actions-v1.0.6-debug.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ColorOS-Power-Actions-v1.0.6-debug
+          path: build-output/ColorOS-Power-Actions-v1.0.6-debug.apk

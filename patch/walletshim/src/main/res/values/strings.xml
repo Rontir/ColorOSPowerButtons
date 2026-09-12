@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Power Actions</string>
+    <string name="screen_title">Power Actions</string>
+    <string name="screen_description">Choose what opens when you double-press the power button on ColorOS.</string>
+    <string name="authentication_title">Unlock to continue</string>
+    <string name="authentication_description">Authenticate to open your selected power-button app.</string>
+    <string name="authentication_unavailable">Authentication could not be started.</string>
+    <string name="target_launch_failed">The selected app could not be opened.</string>
+    <string name="accessibility_service_label">Power Actions redirect</string>
+    <string name="accessibility_service_description">Redirects only the ColorOS Wallet quick-launch window. It cannot read screen contents.</string>
+    <string name="status_active">ACTIVE</string>
+    <string name="status_setup">SETUP NEEDED</string>
+    <string name="status_active_description">Double press is active through the ColorOS Wallet bridge.</string>
+    <string name="status_setup_description">Enable the scoped Accessibility redirect to activate the shortcut.</string>
+    <string name="open_accessibility">Accessibility settings</string>
+    <string name="setup_title">Finish setup</string>
+    <string name="setup_missing_accessibility">Enable “Power Actions redirect” in Accessibility. The service watches only the OPPO Wallet quick-launch window.</string>
+    <string name="double_press_target">DOUBLE PRESS TARGET</string>
+    <string name="no_target_selected">No app selected</string>
+    <string name="target_unavailable">%1$s (not installed)</string>
+    <string name="test_target">Open app</string>
+    <string name="efficient_title">Battery-friendly by design</string>
+    <string name="efficient_description">No logcat monitor, foreground service, overlay, wake lock, network permission or continuous polling. The redirect stays idle until ColorOS opens its Wallet shortcut.</string>
+    <string name="choose_app">Choose an app</string>
+    <string name="choose_app_description">Tap an installed app to use it for the power-button double press.</string>
+    <string name="search_apps">Search installed apps</string>
+    <string name="selected_badge">Selected</string>
+    <string name="target_saved">Double press now opens %1$s</string>
+    <string name="settings_open_failed">Could not open Android settings.</string>
+</resources>
