@@ -2,7 +2,7 @@
 set -euo pipefail
 
 BASE_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-APK="${1:-$BASE_DIR/ColorOS-Power-Actions-v1.0.6-debug.apk}"
+APK="${1:-$BASE_DIR/ColorOS-Power-Actions-v1.0.8-debug.apk}"
 SERIAL="${2:-}"
 PKG="com.heytap.wallet"
 SERVICE="com.heytap.wallet/com.heytap.wallet.WalletRedirectAccessibilityService"
